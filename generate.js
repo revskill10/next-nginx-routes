@@ -6,7 +6,7 @@ const { readFileSync, writeFileSync } = require("fs");
 
 const routesManifest = "./.next/routes-manifest.json";
 const manifest = JSON.parse(readFileSync(routesManifest, "utf8"));
-
+const basePath = manifest.basePath;
 const routes = manifest.staticRoutes
   .concat(manifest.dynamicRoutes)
   .map((route) => {
@@ -14,7 +14,8 @@ const routes = manifest.staticRoutes
       route.page = "/index";
     }
     return `
-location ~ ${route.regex} {
+location ~ ${route.regex.replace("^/", "^/${basePath}/")} {
+    alias alias /var/www/build/${basePath}
     try_files ${route.page}.html /index.html;
 }`;
   });
